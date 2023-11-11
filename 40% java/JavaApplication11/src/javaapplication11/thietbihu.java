@@ -79,6 +79,11 @@ public class thietbihu extends javax.swing.JFrame {
         sua.setBackground(new java.awt.Color(102, 153, 255));
         sua.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         sua.setText("Sửa");
+        sua.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                suaActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -96,6 +101,11 @@ public class thietbihu extends javax.swing.JFrame {
         xoa.setBackground(new java.awt.Color(102, 153, 255));
         xoa.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         xoa.setText("Xóa");
+        xoa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xoaActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 51, 255));
@@ -198,6 +208,20 @@ public class thietbihu extends javax.swing.JFrame {
         row [0] = mathietbi.getText();
         row [1] = thietbihu.getText();
 //        int  [1];
+          int sl = -1;
+        do{
+            row[2] = soluong.getText();
+            try{
+                sl = Integer.parseInt(row[2]);
+            }
+            catch (NumberFormatException e){
+                jOptionPane1.showMessageDialog(them, "Số lượng phải buộc là số.");
+                return;
+            }
+        }while(sl == -1);
+
+                
+        tbmodel.addRow(row);
     }//GEN-LAST:event_themActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -216,6 +240,30 @@ public class thietbihu extends javax.swing.JFrame {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowClosed
+
+    private void suaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suaActionPerformed
+    if (jTable1.getSelectedRow() == -1) {
+            jOptionPane1.showMessageDialog(null, "Chọn mục muốn sửa đi má.");
+            return;
+        } 
+    for(int i=0;i<tbmodel.getRowCount();i++)
+        {
+            if (tbmodel.getValueAt( i, 0).equals(mathietbi.getText())) 
+            {
+                tbmodel.setValueAt(thietbihu.getText(), i, 1);
+                tbmodel.setValueAt(soluong.getText(), i, 2);
+            }
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_suaActionPerformed
+
+    private void xoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xoaActionPerformed
+        // TODO add your handling code here:
+        if (jTable1.getSelectedRow() == -1) {
+            jOptionPane1.showMessageDialog(null, "Chọn dòng để xóa đi cha.");
+        } else if (jOptionPane1.showConfirmDialog(null, "Chắc muốn xóa dòng này không hả hả ?", "Remove", jOptionPane1.YES_NO_OPTION) == jOptionPane1.YES_OPTION) {
+            tbmodel.removeRow(jTable1.getSelectedRow());
+        }           
+    }//GEN-LAST:event_xoaActionPerformed
 
     /**
      * @param args the command line arguments

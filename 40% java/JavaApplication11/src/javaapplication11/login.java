@@ -161,6 +161,7 @@ public class login extends javax.swing.JFrame {
         {
            
            JOptionPane.showMessageDialog(this, "Đăng nhập thành công");
+           this.hide();
            main fm = new main();
            fm.show();
            
