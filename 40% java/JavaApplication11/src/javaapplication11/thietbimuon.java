@@ -9,6 +9,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  *
@@ -32,6 +35,18 @@ public class thietbimuon extends javax.swing.JFrame {
         tableModel.addColumn("Người Mượn");
         tableModel.addColumn("Số Lượng");
         jTable1.setModel(tableModel);
+        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("..\\JavaApplication11\\src\\javaapplication11\\qltbm.txt"));
+            String line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split("\t");
+                tableModel.addRow(row);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
    
         private void themThietBi() {
@@ -52,6 +67,15 @@ public class thietbimuon extends javax.swing.JFrame {
             // Thêm thông tin vào bảng
 
             String[] data = {maThietBi, tenThietBi, ngayMuon, ngayTra, nguoiMuon, soLuong};
+            
+//              kiểm tra dữ liệu trùng
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                if (tableModel.getValueAt(i, 0).equals(data[0])) {
+                    jOptionPane1.showMessageDialog(null, "Dữ liệu bị trùng.");
+                    return;
+                }
+            }
+
             tableModel.addRow(data);
 
             // Xóa nội dung trong các trường thông tin
@@ -93,7 +117,6 @@ public class thietbimuon extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
 
             // Xóa nội dung trong các trường thông tin
             jTextField1.setText("");
@@ -160,6 +183,8 @@ public class thietbimuon extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jTextField7 = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Quản lý thiết bị mượn");
@@ -244,6 +269,13 @@ public class thietbimuon extends javax.swing.JFrame {
             }
         });
 
+        jButton5.setText("Tìm");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -296,11 +328,21 @@ public class thietbimuon extends javax.swing.JFrame {
                         .addGap(66, 66, 66)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(39, 39, 39)
+                .addComponent(jButton5)
+                .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5))
+                .addGap(18, 18, 18)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -385,6 +427,31 @@ public class thietbimuon extends javax.swing.JFrame {
         jTextField6.setText(tableModel.getValueAt(rowid, 5).toString());
     }//GEN-LAST:event_jTable1MouseClicked
 
+    private static boolean Find(JTable table, String searchText) {
+        
+        int rowCount = tableModel.getRowCount();
+
+        for (int i = 0; i < rowCount; i++) {
+            String code = tableModel.getValueAt(i, 0).toString();
+            if (code.equals(searchText)) {
+                // Hiển thị hàng tìm thấy trên JTable
+                table.setRowSelectionInterval(i, i);
+                table.scrollRectToVisible(table.getCellRect(i, 0, true));
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        boolean f = Find(jTable1, jTextField7.getText());
+        if (!f) {
+            jOptionPane1.showMessageDialog(null, "Không tìm thấy mã trong JTable");
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -425,6 +492,7 @@ public class thietbimuon extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -442,5 +510,6 @@ public class thietbimuon extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
+    private javax.swing.JTextField jTextField7;
     // End of variables declaration//GEN-END:variables
 }

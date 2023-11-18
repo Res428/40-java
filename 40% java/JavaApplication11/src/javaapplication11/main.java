@@ -4,14 +4,21 @@
  */
 package javaapplication11;
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.RowFilter;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -26,12 +33,25 @@ public class main extends javax.swing.JFrame {
      */
     public main() {
         initComponents();
+        
         tbmodel = new DefaultTableModel();
         tbmodel.addColumn("Mã TB: ");
         tbmodel.addColumn("Tên TB: ");
         tbmodel.addColumn("Số lượng: ");
         tbmodel.addColumn("Tình Trạng: ");
         jTable1.setModel(tbmodel);
+        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("..\\qltb.txt"));
+            String line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split("\t");
+                tbmodel.addRow(row);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -67,6 +87,8 @@ public class main extends javax.swing.JFrame {
         jToolBar1 = new javax.swing.JToolBar();
         button1 = new java.awt.Button();
         button2 = new java.awt.Button();
+        jTextField1 = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Quản lý thiết bị");
@@ -274,23 +296,40 @@ public class main extends javax.swing.JFrame {
         });
         jToolBar1.add(button2);
 
+        jButton4.setText("Tìm");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 793, Short.MAX_VALUE)
-                .addGap(20, 20, 20))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(39, 39, 39)
+                        .addComponent(jButton4))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 793, Short.MAX_VALUE))
+                .addGap(20, 20, 20))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
+                .addGap(8, 8, 8)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
+                .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -320,7 +359,20 @@ public class main extends javax.swing.JFrame {
         
         row[3] = (String)jComboBox1.getSelectedItem();
         
+//        kiểm tra dữ liệu trùng
+        for (int i = 0; i < tbmodel.getRowCount(); i++) {
+            if (tbmodel.getValueAt(i, 0).equals(row[0])) {
+                jOptionPane1.showMessageDialog(null, "Dữ liệu bị trùng.");
+                return;
+            }
+        }
+        
         tbmodel.addRow(row);
+        
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField5.setText("");
+        jComboBox1.setSelectedItem("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -427,6 +479,31 @@ public class main extends javax.swing.JFrame {
         this.hide();
     }//GEN-LAST:event_button2ActionPerformed
 
+    public static boolean Find(JTable table, String searchText) {
+        
+        int rowCount = tbmodel.getRowCount();
+
+        for (int i = 0; i < rowCount; i++) {
+            String code = tbmodel.getValueAt(i, 0).toString();
+            if (code.equals(searchText)) {
+                // Hiển thị hàng tìm thấy trên JTable
+                table.setRowSelectionInterval(i, i);
+                table.scrollRectToVisible(table.getCellRect(i, 0, true));
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        boolean found = Find(jTable1, jTextField1.getText());
+        if (!found) {
+            jOptionPane1.showMessageDialog(null, "Không tìm thấy mã trong JTable");
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -469,6 +546,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JComboBox<String> jComboBox1;
@@ -483,6 +561,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField5;
